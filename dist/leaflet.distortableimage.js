@@ -1,6 +1,6 @@
 L.DomUtil = L.extend(L.DomUtil, {
 	getMatrixString: function(m) {
-		var is3d = L.Browser.webkit3d || L.Browser.gecko3d,
+		var is3d = L.Browser.webkit3d || L.Browser.gecko3d || L.Browser.ie3d,
 
 			/* 
 		     * Since matrix3d takes a 4*4 matrix, we add in an empty row and column, which act as the identity on the z-axis.
@@ -25,7 +25,7 @@ L.DomUtil = L.extend(L.DomUtil, {
 	},
 
 	getRotateString: function(angle, units) {
-		var is3d = L.Browser.webkit3d,
+		var is3d = L.Browser.webkit3d || L.Browser.gecko3d || L.Browser.ie3d,
 			open = 'rotate' + (is3d ? '3d' : '') + '(',
 			rotateString = (is3d ? '0, 0, 1, ' : '') + angle + units;
 			
@@ -141,6 +141,10 @@ L.EditHandle = L.Marker.extend({
 			zIndexOffset: 10
 		};
 
+		if (options && options.hasOwnProperty('draggable')) {
+			markerOptions.draggable = options.draggable;
+		}
+
 		L.Marker.prototype.initialize.call(this, latlng, markerOptions);
 	},
 
@@ -197,7 +201,7 @@ L.LockHandle = L.EditHandle.extend({
 	options: {
 		TYPE: 'lock',
 		icon: new L.Icon({ 
-      iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3ElEQVR4nM3TMU4CQRSH8d8qJ6AgFia2xksYkj0AhVa2JhRGbfEENJyA3oIjUHkFG42tHUE08QAGC8YwjG8LQsOrdnfm+/Y/7+1WdV3bpQ52ogPBJW6CfUcY4aRcaGXX1xijwjEeMvgJp7jAOd6jBKMEwwDDApYS3DYdoY+f7H6AlwyGt/SiUDDBVSFpF3AXsybBn+TO//qK4EjQEU+hjfvg+YagY9Wws2ijdWMbBdMCfk1pysZuJMy/g48C7mKOTzziEEssmhL0UornDGY9nW+rUU9yQbV3P9PW9QuPNylUonujQAAAAABJRU5ErkJggg%3D%3D',
+			iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA3ElEQVR4nM3TMU4CQRSH8d8qJ6AgFia2xksYkj0AhVa2JhRGbfEENJyA3oIjUHkFG42tHUE08QAGC8YwjG8LQsOrdnfm+/Y/7+1WdV3bpQ52ogPBJW6CfUcY4aRcaGXX1xijwjEeMvgJp7jAOd6jBKMEwwDDApYS3DYdoY+f7H6AlwyGt/SiUDDBVSFpF3AXsybBn+TO//qK4EjQEU+hjfvg+YagY9Wws2ijdWMbBdMCfk1pysZuJMy/g48C7mKOTzziEEssmhL0UornDGY9nW+rUU9yQbV3P9PW9QuPNylUonujQAAAAABJRU5ErkJggg%3D%3D',
 			iconSize: [16, 16],
 			iconAnchor: [8, 8]}
 		)
@@ -217,7 +221,7 @@ L.DistortHandle = L.EditHandle.extend({
 	options: {
 		TYPE: 'distort',
 		icon: new L.Icon({
-      iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABH0lEQVR4nKXTvy5EURDH8c8V/SJBr9HzBFiN/7wAzWolIoqloCBRiJ7GvoBd/0IhnsB6hO0pWE+wintOcnKzZMUkN5Mzmd/3zNyZk5XLZf+xvi6xUeyjiU984AVVDBeT+wvnZVxioBCfDN8O1nHbrYIl1IP4HjMYxBBm8RDO11gsAkZQQ4Y9LOAZ7dDGE+ZwEHJqsZ0IqISb73Bc7DOxQzyGSiopYC34s1/E0U5TTQSMBf/aA6CZaiIgC77TAyDmZCmgFfxED4CY00oB9eC3egBsp5oIOMeXfJF2fxFXMS8f70UKeJNvWAcnaGAKJfl4p+XbdxRyNoJGVnhMK/JVLv1QQTtcdBMDxbfQwDg2sSofVUf+w65C2e+poFjBn+0bdEY280EXr3wAAAAASUVORK5CYII%3D',
+			iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABH0lEQVR4nKXTvy5EURDH8c8V/SJBr9HzBFiN/7wAzWolIoqloCBRiJ7GvoBd/0IhnsB6hO0pWE+wintOcnKzZMUkN5Mzmd/3zNyZk5XLZf+xvi6xUeyjiU984AVVDBeT+wvnZVxioBCfDN8O1nHbrYIl1IP4HjMYxBBm8RDO11gsAkZQQ4Y9LOAZ7dDGE+ZwEHJqsZ0IqISb73Bc7DOxQzyGSiopYC34s1/E0U5TTQSMBf/aA6CZaiIgC77TAyDmZCmgFfxED4CY00oB9eC3egBsp5oIOMeXfJF2fxFXMS8f70UKeJNvWAcnaGAKJfl4p+XbdxRyNoJGVnhMK/JVLv1QQTtcdBMDxbfQwDg2sSofVUf+w65C2e+poFjBn+0bdEY280EXr3wAAAAASUVORK5CYII%3D',
 			iconSize: [16, 16],
 			iconAnchor: [8, 8]}
 		)
@@ -238,7 +242,7 @@ L.RotateHandle = L.EditHandle.extend({
 	options: {
 		TYPE: 'rotate',
 		icon: new L.Icon({ 
-      iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABG0lEQVR4nKXSvS5EURTF8d8V/SBBr9F7A4zGNy9AQytRKIaCgkQhehrzAmZ8hUI8wYxHmJ7CjCcYxT0nublmJlecZueerPXf69y9k0a57D9nqMfdJI7QRBtfaKCC8bw4ySVYww1G+jRsYwsPvRKsohbMT5jHKMawgOfwfYeVPGACVSQ4xDLe0AldX7GI46CpxudEwE7o/IizPvHhBC8hyU4WsBnq5QBzPBdZTwRMhfpeANDMeiIgCbVbABA1SRbQCnWmACBqWllALdS9AoD9rCcCrvAtXaSDAeYKlqTjvc4CPqQb1sU56phFSTreOen2nQbNdvD8WuV16SqX+iTohEb38WI4J6hjGrvYkI6qK/1htyH2Z9aQT/Dn8wMV5jnxJDAcbAAAAABJRU5ErkJggg%3D%3D',
+			iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABG0lEQVR4nKXSvS5EURTF8d8V/SBBr9F7A4zGNy9AQytRKIaCgkQhehrzAmZ8hUI8wYxHmJ7CjCcYxT0nublmJlecZueerPXf69y9k0a57D9nqMfdJI7QRBtfaKCC8bw4ySVYww1G+jRsYwsPvRKsohbMT5jHKMawgOfwfYeVPGACVSQ4xDLe0AldX7GI46CpxudEwE7o/IizPvHhBC8hyU4WsBnq5QBzPBdZTwRMhfpeANDMeiIgCbVbABA1SRbQCnWmACBqWllALdS9AoD9rCcCrvAtXaSDAeYKlqTjvc4CPqQb1sU56phFSTreOen2nQbNdvD8WuV16SqX+iTohEb38WI4J6hjGrvYkI6qK/1htyH2Z9aQT/Dn8wMV5jnxJDAcbAAAAABJRU5ErkJggg%3D%3D',
 			iconSize: [16, 16],
 			iconAnchor: [8, 8]}
 		)
@@ -326,12 +330,29 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
 		map.on('viewreset', this._reset, this);
 		/* End copied from L.ImageOverlay */
 
-		/* Have to wait for the image to load because we need to access its width and height. */
+		/* Use provided corners if available */
+		if (this.options.corners) { 
+			this._corners = this.options.corners; 
+			if (map.options.zoomAnimation && L.Browser.any3d) {
+				map.on('zoomanim', this._animateZoom, this);
+			}
+
+			/* This reset happens before image load; it allows 
+			 * us to place the image on the map earlier with 
+			 * "guessed" dimensions. */
+			this._reset();
+		}
+
+		/* Have to wait for the image to load because 
+		 * we need to access its width and height. */
 		L.DomEvent.on(this._image, 'load', function() {
 			this._initImageDimensions();
 			this._reset();
-			if (map.options.zoomAnimation && L.Browser.any3d) {
-				map.on('zoomanim', this._animateZoom, this);
+			/* Initialize default corners if not already set */
+			if (!this._corners) { 
+				if (map.options.zoomAnimation && L.Browser.any3d) {
+					map.on('zoomanim', this._animateZoom, this);
+				}
 			}
 		}, this);		
 
@@ -390,9 +411,9 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
  		if (!this.hasEventListeners(event.type)) { return; }
 
 		var map = this._map,
-				containerPoint = map.mouseEventToContainerPoint(event),
-				layerPoint = map.containerPointToLayerPoint(containerPoint),
-				latlng = map.layerPointToLatLng(layerPoint);
+			containerPoint = map.mouseEventToContainerPoint(event),
+			layerPoint = map.containerPointToLayerPoint(containerPoint),
+			latlng = map.layerPointToLatLng(layerPoint);
 
 		this.fire(event.type, {
 			latlng: latlng,
@@ -407,6 +428,21 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
 		this._reset();
 	},
 
+
+	/* Copied from Leaflet v0.7 https://github.com/Leaflet/Leaflet/blob/66282f14bcb180ec87d9818d9f3c9f75afd01b30/src/dom/DomUtil.js#L189-L199 */
+	/* since L.DomUtil.getTranslateString() is deprecated in Leaflet v1.0 */
+	_getTranslateString: function (point) {
+		// on WebKit browsers (Chrome/Safari/iOS Safari/Android) using translate3d instead of translate
+		// makes animation smoother as it ensures HW accel is used. Firefox 13 doesn't care
+		// (same speed either way), Opera 12 doesn't support translate3d
+
+		var is3d = L.Browser.webkit3d,
+		    open = 'translate' + (is3d ? '3d' : '') + '(',
+		    close = (is3d ? ',0' : '') + ')';
+
+		return open + point.x + 'px,' + point.y + 'px' + close;
+	},
+
 	_reset: function() {
 		var map = this._map,
 			image = this._image,
@@ -416,7 +452,7 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
 			topLeft = latLngToLayerPoint(this._corners[0]),
 
 			warp = L.DomUtil.getMatrixString(transformMatrix),
-			translation = L.DomUtil.getTranslateString(topLeft);
+			translation = this._getTranslateString(topLeft);
 
 		/* See L.DomUtil.setPosition. Mainly for the purposes of L.Draggable. */
 		image._leaflet_pos = topLeft;
@@ -438,17 +474,19 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
 			latLngToNewLayerPoint = function(latlng) {
 				return map._latLngToNewLayerPoint(latlng, event.zoom, event.center);
 			},
-
+	
 			transformMatrix = this._calculateProjectiveTransform(latLngToNewLayerPoint),
 			topLeft = latLngToNewLayerPoint(this._corners[0]),
-
+	
 			warp = L.DomUtil.getMatrixString(transformMatrix),
-			translation = L.DomUtil.getTranslateString(topLeft);
-
+			translation = this._getTranslateString(topLeft);
+	
 		/* See L.DomUtil.setPosition. Mainly for the purposes of L.Draggable. */
 		image._leaflet_pos = topLeft;
-
-		image.style[L.DomUtil.TRANSFORM] = [translation, warp].join(' ');
+	
+		if (!L.Browser.gecko) {
+			image.style[L.DomUtil.TRANSFORM] = [translation, warp].join(' ');
+		}
 	},
 
 	getCorners: function() {
@@ -475,17 +513,19 @@ L.DistortableImageOverlay = L.ImageOverlay.extend({
 	},
 
 	_calculateProjectiveTransform: function(latLngToCartesian) {
+		/* Setting reasonable but made-up image defaults 
+		 * allow us to place images on the map before 
+		 * they've finished downloading. */
 		var offset = latLngToCartesian(this._corners[0]),
-			w = this._image.offsetWidth, 
-			h = this._image.offsetHeight,
+			w = this._image.offsetWidth || 500, 
+			h = this._image.offsetHeight || 375,
 			c = [],
 			j;
-
 		/* Convert corners to container points (i.e. cartesian coordinates). */
 		for (j = 0; j < this._corners.length; j++) {
 			c.push(latLngToCartesian(this._corners[j])._subtract(offset));
 		}
-
+		
 		/*
 		 * This matrix describes the action of the CSS transform on each corner of the image.
 		 * It maps from the coordinate system centered at the upper left corner of the image
@@ -555,6 +595,7 @@ var EditOverlayAction = L.ToolbarAction.extend({
 			var map = this._map;
 
 			map.removeLayer(this._overlay);
+			this._overlay.fire('delete');
 			this.disable();
 		}
 	}),
@@ -648,13 +689,14 @@ L.DistortableImage.Edit = L.Handler.extend({
 
 	/* Run on image seletion. */
 	addHooks: function() {
+console.log('adding hooks');
 		var overlay = this._overlay,
 			map = overlay._map,
 			i;
 
 		this._lockHandles = new L.LayerGroup();
 		for (i = 0; i < 4; i++) {
-			this._lockHandles.addLayer(new L.LockHandle(overlay, i));
+			this._lockHandles.addLayer(new L.LockHandle(overlay, i, { draggable: false }));
 		}
 
 		this._distortHandles = new L.LayerGroup();
@@ -681,6 +723,7 @@ L.DistortableImage.Edit = L.Handler.extend({
 			this._enableDragging();
 		}
 
+console.log('click listener');
 		//overlay.on('click', this._showToolbar, this);
 		L.DomEvent.on(overlay, 'click', this._showToolbar, this);
 
@@ -688,6 +731,7 @@ L.DistortableImage.Edit = L.Handler.extend({
 		L.DomEvent.on(window, 'keydown', this._onKeyDown, this);
 
 		overlay.fire('select');
+
 	},
 
 	/* Run on image deseletion. */
@@ -862,6 +906,10 @@ L.DistortableImage.Edit = L.Handler.extend({
 		else { point = event.target._dragStartTarget._leaflet_pos; }
 		var raised_point = map.containerPointToLatLng(new L.Point(point.x,point.y-20));
 		this.toolbar = new L.DistortableImage.EditToolbar(raised_point).addTo(map, overlay);
+		overlay.fire('toolbar:created');
+
+console.log('showToolbar');
+		L.DomEvent.stopPropagation(event);
 	},
 
 	toggleIsolate: function() {
